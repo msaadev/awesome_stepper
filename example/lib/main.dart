@@ -68,12 +68,3 @@ class Stepper extends StatelessWidget {
     );
   }
 }
-
-
-/*
-Container(
-              margin: 5.paddingSymmetricHorizontal,
-              decoration: BoxDecoration(
-                  color: Colors.green, borderRadius: 5.customRadius),
-            )
-*/
