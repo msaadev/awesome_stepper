@@ -1,5 +1,5 @@
+import 'package:awesome_stepper/awesome_stepper.dart';
 import 'package:flutter/material.dart';
-import 'package:lib_msaadev/lib_msaadev.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,62 +8,38 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Material App',
-      home: Home(),
-    );
-  }
-}
-
-class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(), body: Stepper());
-  }
-}
-
-class Stepper extends StatelessWidget {
-  const Stepper({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            decoration:
-                BoxDecoration(color: Colors.red, borderRadius: 5.customRadius),
-            margin: 5.paddingAll,
-            height: context.height * 0.1,
-          ),
-          Flexible(
-            child: PageView(
-              children: [
-                Container(
-                  margin: 5.paddingSymmetricHorizontal,
-                  decoration: BoxDecoration(
-                      color: Colors.green, borderRadius: 5.customRadius),
-                ),
-                Container(
-                  margin: 5.paddingSymmetricHorizontal,
-                  decoration: BoxDecoration(
-                      color: Colors.green, borderRadius: 5.customRadius),
-                ),
-                Container(
-                  margin: 5.paddingSymmetricHorizontal,
-                  decoration: BoxDecoration(
-                      color: Colors.green, borderRadius: 5.customRadius),
-                )
-              ],
-            ),
-          ),
-          Container(
-            margin: 5.paddingAll,
-            height: context.height * 0.1,
-            decoration:
-                BoxDecoration(color: Colors.red, borderRadius: 5.customRadius),
-          ),
-        ],
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Material App Bar'),
+        ),
+        body: AwesomeStepper(
+          steps: [
+            AwesomeStepperItem(
+              label: 'Step 1', 
+              content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 1'),
+            ) ),
+            AwesomeStepperItem(
+              label: 'Step 2', 
+              content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 2'),
+            ) ),
+            AwesomeStepperItem(
+              label: 'Step 3', 
+              content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 3'),
+            ) ),
+            AwesomeStepperItem(
+              label: 'Step 4', 
+              content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 4'),
+            ) ),
+          ],
+        ),
       ),
     );
   }
