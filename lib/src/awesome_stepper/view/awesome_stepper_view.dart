@@ -34,15 +34,15 @@ class _AwesomeStepperState extends State<AwesomeStepper> {
 
   Container buildTop() {
     return Container(
-      height: context.customHeight(8),
+      height: context.customHeight(9),
       color: Colors.grey,
       child: Row(
         children: [
           Expanded(
               child: Center(
             child: Container(
-              height: context.customHeight(8),
-              width: context.customHeight(8),
+              height: context.customHeight(9),
+              width: context.customHeight(9),
               padding: 10.paddingAll,
               child: Observer(builder: (_) {
                 return Stack(
@@ -80,14 +80,14 @@ class _AwesomeStepperState extends State<AwesomeStepper> {
       children: [
         Expanded(
           child: Container(
-            height: context.customHeight(8),
+            height: context.customHeight(9),
             color: Colors.red,
           ).onTap(() => _viewModel.decrementStep()),
         ),
         10.wSized,
         Expanded(
           child: Container(
-            height: context.customHeight(8),
+            height: context.customHeight(9),
             color: Colors.green,
           ).onTap(() => _viewModel.incrementStep()),
         ),
