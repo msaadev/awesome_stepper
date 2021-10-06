@@ -16,7 +16,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     with TickerProviderStateMixin {
   late final AwesomeStepperViewModel _viewModel;
   late final Animation<Offset> _offsetAnimation;
-  late final AnimationController _controller;
+  late final AnimationController _controller, _circleValue;
+  late final double ratio;
 
   @override
   void initState() {
@@ -26,6 +27,10 @@ class _AwesomeStepperState extends State<AwesomeStepper>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+    _circleValue = AnimationController(
+      duration: 1.secondDuration,
+      vsync: this,
+    );
     _offsetAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0.0, -1.5),
@@ -33,10 +38,14 @@ class _AwesomeStepperState extends State<AwesomeStepper>
       parent: _controller,
       curve: Curves.ease,
     ));
-
-    _controller.addListener(() {
+    _circleValue.addListener(() {
       setState(() {});
     });
+
+    ratio = 1 / widget.steps.length;
+
+    Future.delayed(500.millisecondsDuration)
+        .whenComplete(() => _circleValue.animateTo(ratio));
   }
 
   @override
@@ -71,10 +80,10 @@ class _AwesomeStepperState extends State<AwesomeStepper>
                 fit: StackFit.expand,
                 alignment: Alignment.center,
                 children: [
-                  CircularProgressIndicator(value: _controller.value),
+                  CircularProgressIndicator(value: _circleValue.value),
                   Center(
                     child: Text(
-                        '${widget.steps.length} / ${_viewModel.currentStep + 1} '),
+                        '${_viewModel.currentStep + 1} / ${widget.steps.length}  '),
                   )
                 ],
               );
@@ -84,8 +93,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
             return SlideTransition(
                 position: _offsetAnimation,
                 child: Center(
-                    child: Text(widget.steps[_viewModel.currentStep].label +
-                        '${_controller.value}')));
+                    child: Text(widget.steps[_viewModel.currentStep].label)));
           })),
         ],
       ),
@@ -117,6 +125,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   tap(bool isIncrement) {
+   isIncrement ? _circleValue.animateTo(_circleValue.value + ratio) : _circleValue.animateTo(_circleValue.value - ratio);
     _controller.forward().whenComplete(() {
       isIncrement ? _viewModel.incrementStep() : _viewModel.decrementStep();
       _controller.reverse();

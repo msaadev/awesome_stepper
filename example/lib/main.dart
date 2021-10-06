@@ -62,6 +62,24 @@ class _MyHomeState extends State<MyHome> {
               alignment: Alignment.center,
               child: Text('Step 4'),
             )),
+        AwesomeStepperItem(
+            label: 'Step 5',
+            content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 5'),
+            )),
+        AwesomeStepperItem(
+            label: 'Step 6',
+            content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 6'),
+            )),
+        AwesomeStepperItem(
+            label: 'Step 7',
+            content: Container(
+              alignment: Alignment.center,
+              child: Text('Step 7'),
+            )),
       ],
     );
   }
