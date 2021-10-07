@@ -1,4 +1,3 @@
-import 'package:awesome_stepper/awesome_stepper.dart';
 import 'package:mobx/mobx.dart';
 part 'awesome_stepper_view_model.g.dart';
 

@@ -37,6 +37,9 @@ class _MyHomeState extends State<MyHome> {
 
   AwesomeStepper awesomeStepper() {
     return AwesomeStepper(
+      onStepChanged: (page) {
+        print('active page = $page');
+      },
       steps: [
         AwesomeStepperItem(
             label: 'Step 1',

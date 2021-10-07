@@ -6,7 +6,9 @@ import 'package:lib_msaadev/lib_msaadev.dart';
 
 class AwesomeStepper extends StatefulWidget {
   final List<AwesomeStepperItem> steps;
-  const AwesomeStepper({Key? key, required this.steps}) : super(key: key);
+  final Function(int page)? onStepChanged;
+  const AwesomeStepper({Key? key, required this.steps, this.onStepChanged})
+      : super(key: key);
 
   @override
   State<AwesomeStepper> createState() => _AwesomeStepperState();
@@ -24,7 +26,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     super.initState();
     _viewModel = AwesomeStepperViewModel();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
     _circleValue = AnimationController(
@@ -125,9 +127,15 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   tap(bool isIncrement) {
-   isIncrement ? _circleValue.animateTo(_circleValue.value + ratio) : _circleValue.animateTo(_circleValue.value - ratio);
+    isIncrement
+        ? _circleValue.animateTo(_circleValue.value + ratio)
+        : _circleValue.animateTo(_circleValue.value - ratio);
     _controller.forward().whenComplete(() {
       isIncrement ? _viewModel.incrementStep() : _viewModel.decrementStep();
+
+      if (widget.onStepChanged != null)
+        widget.onStepChanged!(_viewModel.currentStep + 1 );
+
       _controller.reverse();
     });
   }
