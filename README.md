@@ -20,7 +20,7 @@ Awesome Stepper with beautiful UI and Animations
 
 ## Installation
 
-Add `awesome_stepper: ^0.0.21` to your `pubspec.yaml` dependencies. And import it:
+Add `awesome_stepper: ^0.0.3` to your `pubspec.yaml` dependencies. And import it:
 
 ```dart
 import 'package:awesome_stepper/awesome_stepper.dart';
