@@ -1,6 +1,5 @@
 import 'package:awesome_stepper/awesome_stepper.dart';
 import 'package:awesome_stepper/src/awesome_stepper/view_model/awesome_stepper_view_model.dart';
-import 'package:awesome_stepper/src/extensions/context_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -38,11 +37,11 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   late final Animation<double> textAnimation;
   late final AnimationController _controller, _circleValue;
   late final double ratio;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _viewModel = AwesomeStepperViewModel();
     _controller = AnimationController(
       duration:
@@ -89,7 +88,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Container buildTop() {
-    final double height = widget.headerHeight ?? context.dynamicHeight(0.1);
+    final double height = widget.headerHeight ?? 70;
 
     return Container(
       height: height,
@@ -150,24 +149,26 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Widget defaultController() {
-    final double height = widget.controllerHeight ?? context.dynamicHeight(0.1);
+    final double height = widget.controllerHeight ?? 70;
     return Row(
       children: [
         Expanded(
           child: InkWell(
             onTap: () => tap(false),
             child: Container(
-              margin: context.paddingLow,
+              margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                borderRadius: context.lowBorderRadius,
+                borderRadius: BorderRadius.circular(5),
                 color: Colors.red,
               ),
               height: height,
               alignment: Alignment.center,
               child: Text(
                 'Back',
-                style:
-                    context.textTheme.headline6!.copyWith(color: Colors.white),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(color: Colors.white),
               ),
             ),
           ),
@@ -179,17 +180,19 @@ class _AwesomeStepperState extends State<AwesomeStepper>
           child: InkWell(
             onTap: () => tap(true),
             child: Container(
-              margin: context.paddingLow,
+              margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                borderRadius: context.lowBorderRadius,
+                borderRadius: BorderRadius.circular(5),
                 color: Colors.green,
               ),
               height: height,
               alignment: Alignment.center,
               child: Text(
                 'Next',
-                style:
-                    context.textTheme.headline6!.copyWith(color: Colors.white),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(color: Colors.white),
               ),
             ),
           ),

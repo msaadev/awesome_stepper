@@ -1,4 +1,3 @@
-
 import 'package:awesome_stepper/awesome_stepper.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +9,7 @@ class CustomStepper extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Custom Awesome Stepper'),
-      centerTitle: true,
+        centerTitle: true,
       ),
       body: awesomeStepper(),
     );
@@ -32,7 +31,8 @@ class CustomStepper extends StatelessWidget {
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded)),
             IconButton(
-                onPressed: onNext, icon: const Icon(Icons.arrow_forward_ios_rounded)),
+                onPressed: onNext,
+                icon: const Icon(Icons.arrow_forward_ios_rounded)),
           ],
         );
       },
@@ -51,13 +51,13 @@ class CustomStepper extends StatelessWidget {
             label: 'Step 2',
             content: Container(
               alignment: Alignment.center,
-              child:const  Text('Step 2'),
+              child: const Text('Step 2'),
             )),
         AwesomeStepperItem(
             label: 'Step 3',
             content: Container(
               alignment: Alignment.center,
-              child:const  Text('Step 3'),
+              child: const Text('Step 3'),
             )),
         AwesomeStepperItem(
             label: 'Step 4',

@@ -5,8 +5,6 @@ class AwesomeStepperViewModel = _AwesomeStepperViewModelBase
     with _$AwesomeStepperViewModel;
 
 abstract class _AwesomeStepperViewModelBase with Store {
-
-
   @observable
   int currentStep = 0;
   @action
