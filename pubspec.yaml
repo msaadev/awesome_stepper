@@ -1,7 +1,10 @@
 name: awesome_stepper
-description: A new Flutter package project.
+description: A Customizable Awesome Stepper with beautiful UI.
 version: 0.0.1
-homepage: null
+homepage: https://github.com/msaadev/
+repository: https://github.com/msaadev/awesome_stepper
+documentation: https://github.com/msaadev/awesome_stepper
+
 environment:
   sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
