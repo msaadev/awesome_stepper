@@ -1,8 +1,8 @@
 import 'package:awesome_stepper/awesome_stepper.dart';
 import 'package:awesome_stepper/src/awesome_stepper/view_model/awesome_stepper_view_model.dart';
+import 'package:awesome_stepper/src/extensions/context_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:kartal/kartal.dart';
 
 class AwesomeStepper extends StatefulWidget {
   final List<AwesomeStepperItem> steps;
@@ -38,11 +38,11 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   late final Animation<double> textAnimation;
   late final AnimationController _controller, _circleValue;
   late final double ratio;
-
+  
   @override
   void initState() {
     super.initState();
-
+    
     _viewModel = AwesomeStepperViewModel();
     _controller = AnimationController(
       duration:

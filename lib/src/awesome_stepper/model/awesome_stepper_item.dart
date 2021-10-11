@@ -4,7 +4,5 @@ class AwesomeStepperItem {
   final String label;
   final Widget content;
 
-  AwesomeStepperItem({ required this.label, required this.content});
-
-  
+  AwesomeStepperItem({ required this.label, required this.content});  
 }

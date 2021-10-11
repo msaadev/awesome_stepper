@@ -1,6 +1,6 @@
 name: awesome_stepper
-description: A Customizable Awesome Stepper with beautiful UI.
-version: 0.0.1
+description: A Customizable Awesome Stepper with beautiful UI to develop awesome steppers.
+version: 0.0.2
 homepage: https://github.com/msaadev/
 repository: https://github.com/msaadev/awesome_stepper
 documentation: https://github.com/msaadev/awesome_stepper
@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_mobx: ^2.0.2
-  kartal: ^2.2.0
   mobx: ^2.0.4
   mobx_codegen: ^2.0.3
 

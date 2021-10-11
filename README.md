@@ -1,7 +1,7 @@
 # awesome_stepper
 
-Yeni bir flutter paket geliştirme denemesi.
+To Develop beautiful Step Wizards use Awesome Stepper
 
 ## Getting Started
 
-Awesome Stepper ile çok daha iyi step wizard geliştirebileceksiniz.
+You can develop beautiful Steps with Awesome Stepper

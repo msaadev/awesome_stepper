@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'customized_stepper.dart';
 import 'default_stepper.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Awesome Stepper',
       home: Home(),
     );
@@ -20,7 +22,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Awesome Stepper'),
+      appBar: AppBar(title:const  Text('Awesome Stepper'),
       centerTitle: true,
       ),
         body: Center(
@@ -31,18 +33,18 @@ class Home extends StatelessWidget {
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => DefaultStepper()));
+                        MaterialPageRoute(builder: (_) =>const DefaultStepper()));
                   },
-                  child: Text('Default Stepper')),
-              SizedBox(
+                  child:const  Text('Default Stepper')),
+              const SizedBox(
                 height: 20,
               ),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => CustomStepper()));
+                        MaterialPageRoute(builder: (_) => const CustomStepper()));
                   },
-                  child: Text('Customized Stepper'))
+                  child: const Text('Customized Stepper'))
             ],
           ),
         ),

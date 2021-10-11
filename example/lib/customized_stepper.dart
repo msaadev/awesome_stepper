@@ -9,7 +9,7 @@ class CustomStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Custom Awesome Stepper'),
+        title: const Text('Custom Awesome Stepper'),
       centerTitle: true,
       ),
       body: awesomeStepper(),
@@ -20,23 +20,24 @@ class CustomStepper extends StatelessWidget {
     return AwesomeStepper(
       headerColor: Colors.blue,
       progressColor: Colors.red,
-      headerStyle: TextStyle(color: Colors.white, fontSize: 20),
-      progressBarAnimationDuration: Duration(seconds: 2),
-      headerAnimationDuration: Duration(seconds: 1),
-      progressStyle: TextStyle(color: Colors.white, fontSize: 20),
+      headerStyle: const TextStyle(color: Colors.white, fontSize: 20),
+      progressBarAnimationDuration: const Duration(seconds: 2),
+      headerAnimationDuration: const Duration(seconds: 1),
+      progressStyle: const TextStyle(color: Colors.white, fontSize: 20),
       controlBuilder: (onNext, onBack) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
                 onPressed: onBack,
-                icon: Icon(Icons.arrow_back_ios_new_rounded)),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded)),
             IconButton(
-                onPressed: onNext, icon: Icon(Icons.arrow_forward_ios_rounded)),
+                onPressed: onNext, icon: const Icon(Icons.arrow_forward_ios_rounded)),
           ],
         );
       },
       onStepChanged: (page) {
+        // ignore: avoid_print
         print('active page = $page');
       },
       steps: [
@@ -44,43 +45,43 @@ class CustomStepper extends StatelessWidget {
             label: 'Step 1',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 1'),
+              child: const Text('Step 1'),
             )),
         AwesomeStepperItem(
             label: 'Step 2',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 2'),
+              child:const  Text('Step 2'),
             )),
         AwesomeStepperItem(
             label: 'Step 3',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 3'),
+              child:const  Text('Step 3'),
             )),
         AwesomeStepperItem(
             label: 'Step 4',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 4'),
+              child: const Text('Step 4'),
             )),
         AwesomeStepperItem(
             label: 'Step 5',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 5'),
+              child: const Text('Step 5'),
             )),
         AwesomeStepperItem(
             label: 'Step 6',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 6'),
+              child: const Text('Step 6'),
             )),
         AwesomeStepperItem(
             label: 'Step 7',
             content: Container(
               alignment: Alignment.center,
-              child: Text('Step 7'),
+              child: const Text('Step 7'),
             )),
       ],
     );
