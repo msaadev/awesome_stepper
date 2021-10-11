@@ -37,6 +37,24 @@ class _MyHomeState extends State<MyHome> {
 
   AwesomeStepper awesomeStepper() {
     return AwesomeStepper(
+      headerColor: Colors.blue,
+      progressColor: Colors.red,
+      headerStyle: TextStyle(color: Colors.white, fontSize: 20),
+      progressBarAnimationDuration: Duration(seconds: 2),
+      headerAnimationDuration: Duration(seconds: 1),
+      progressStyle: TextStyle(color: Colors.white, fontSize: 20),
+      controlBuilder: (onNext, onBack) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: onBack,
+                icon: Icon(Icons.arrow_back_ios_new_rounded)),
+            IconButton(
+                onPressed: onNext, icon: Icon(Icons.arrow_forward_ios_rounded)),
+          ],
+        );
+      },
       onStepChanged: (page) {
         print('active page = $page');
       },

@@ -7,9 +7,27 @@ import 'package:kartal/kartal.dart';
 class AwesomeStepper extends StatefulWidget {
   final List<AwesomeStepperItem> steps;
   final Function(int page)? onStepChanged;
-  const AwesomeStepper({Key? key, required this.steps, this.onStepChanged})
-      : super(key: key);
+  final Color? headerColor, progressColor;
+  final TextStyle? headerStyle, progressStyle;
+  final double? headerHeight, controllerHeight;
+  final Duration? headerAnimationDuration, progressBarAnimationDuration;
+  final Widget Function(Function() onNextTapped, Function() onBackTapped)?
+      controlBuilder;
 
+  const AwesomeStepper(
+      {Key? key,
+      required this.steps,
+      this.onStepChanged,
+      this.headerColor,
+      this.headerStyle,
+      this.progressStyle,
+      this.headerAnimationDuration,
+      this.progressBarAnimationDuration,
+      this.controlBuilder,
+      this.progressColor,
+      this.headerHeight,
+      this.controllerHeight})
+      : super(key: key);
   @override
   State<AwesomeStepper> createState() => _AwesomeStepperState();
 }
@@ -27,11 +45,12 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
     _viewModel = AwesomeStepperViewModel();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 250),
+      duration:
+          widget.headerAnimationDuration ?? const Duration(milliseconds: 250),
       vsync: this,
     );
     _circleValue = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: widget.progressBarAnimationDuration ?? Duration(seconds: 1),
       vsync: this,
     );
     textAnimation = Tween(
@@ -70,25 +89,31 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Container buildTop() {
+    final double height = widget.headerHeight ?? context.dynamicHeight(0.1);
+
     return Container(
-      height: context.dynamicHeight(.1),
-      
-      color: Colors.grey,
+      height: height,
+      color: widget.headerColor ?? Colors.white,
       child: Row(
         children: [
           Container(
-            height: context.dynamicHeight(.1),
-            width: context.dynamicHeight(.1),
+            height:height,
+            width:height,
             padding: EdgeInsets.all(10),
             child: Observer(builder: (_) {
               return Stack(
                 fit: StackFit.expand,
                 alignment: Alignment.center,
                 children: [
-                  CircularProgressIndicator(value: _circleValue.value),
+                  CircularProgressIndicator(
+                    value: _circleValue.value,
+                    color: widget.progressColor,
+                  ),
                   Center(
                     child: Text(
-                        '${_viewModel.currentStep + 1} / ${widget.steps.length}  '),
+                      ' ${_viewModel.currentStep + 1} / ${widget.steps.length}  ',
+                      style: widget.progressStyle,
+                    ),
                   )
                 ],
               );
@@ -98,7 +123,10 @@ class _AwesomeStepperState extends State<AwesomeStepper>
             return FadeTransition(
                 opacity: textAnimation,
                 child: Center(
-                    child: Text(widget.steps[_viewModel.currentStep].label)));
+                    child: Text(
+                  widget.steps[_viewModel.currentStep].label,
+                  style: widget.headerStyle,
+                )));
           })),
         ],
       ),
@@ -110,31 +138,40 @@ class _AwesomeStepperState extends State<AwesomeStepper>
       });
 
   Widget buildBottom() {
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap:() => tap(false),
-            child: Container(
-              height: context.dynamicHeight(.1),
-              color: Colors.red,
+    if (widget.controlBuilder != null) {
+      return widget.controlBuilder!(() {
+        tap(true);
+      }, () {
+        tap(false);
+      });
+    } else {
+    final double height = widget.controllerHeight ?? context.dynamicHeight(0.1);
+      return Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => tap(false),
+              child: Container(
+                height: height,
+                color: Colors.red,
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Expanded(
-          child: InkWell(
-            onTap:() => tap(true),
-            child: Container(
-              height: context.dynamicHeight(.1),
-              color: Colors.green,
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () => tap(true),
+              child: Container(
+                height: height,
+                color: Colors.green,
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    }
   }
 
   tap(bool isIncrement) {
@@ -145,7 +182,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
       isIncrement ? _viewModel.incrementStep() : _viewModel.decrementStep();
 
       if (widget.onStepChanged != null)
-        widget.onStepChanged!(_viewModel.currentStep + 1);
+        widget.onStepChanged!(_viewModel.currentStep);
 
       _controller.reverse();
     });
