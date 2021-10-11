@@ -37,7 +37,6 @@ class CustomStepper extends StatelessWidget {
         );
       },
       onStepChanged: (page) {
-        // ignore: avoid_print
         print('active page = $page');
       },
       steps: [
