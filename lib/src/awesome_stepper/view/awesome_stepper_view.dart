@@ -97,8 +97,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
       child: Row(
         children: [
           Container(
-            height:height,
-            width:height,
+            height: height,
+            width: height,
             padding: EdgeInsets.all(10),
             child: Observer(builder: (_) {
               return Stack(
@@ -145,33 +145,57 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         tap(false);
       });
     } else {
+      return defaultController();
+    }
+  }
+
+  Widget defaultController() {
     final double height = widget.controllerHeight ?? context.dynamicHeight(0.1);
-      return Row(
-        children: [
-          Expanded(
-            child: InkWell(
-              onTap: () => tap(false),
-              child: Container(
-                height: height,
+    return Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: () => tap(false),
+            child: Container(
+              margin: context.paddingLow,
+              decoration: BoxDecoration(
+                borderRadius: context.lowBorderRadius,
                 color: Colors.red,
               ),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: InkWell(
-              onTap: () => tap(true),
-              child: Container(
-                height: height,
-                color: Colors.green,
+              height: height,
+              alignment: Alignment.center,
+              child: Text(
+                'Back',
+                style:
+                    context.textTheme.headline6!.copyWith(color: Colors.white),
               ),
             ),
           ),
-        ],
-      );
-    }
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: InkWell(
+            onTap: () => tap(true),
+            child: Container(
+              margin: context.paddingLow,
+              decoration: BoxDecoration(
+                borderRadius: context.lowBorderRadius,
+                color: Colors.green,
+              ),
+              height: height,
+              alignment: Alignment.center,
+              child: Text(
+                'Next',
+                style:
+                    context.textTheme.headline6!.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   tap(bool isIncrement) {
