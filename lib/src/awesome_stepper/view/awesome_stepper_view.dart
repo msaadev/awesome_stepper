@@ -4,12 +4,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class AwesomeStepper extends StatefulWidget {
+
+  /// required to build steps
   final List<AwesomeStepperItem> steps;
+
+  /// Returns active step
   final Function(int page)? onStepChanged;
-  final Color? headerColor, progressColor;
-  final TextStyle? headerStyle, progressStyle;
-  final double? headerHeight, controllerHeight;
-  final Duration? headerAnimationDuration, progressBarAnimationDuration;
+
+  /// set the header color
+  final Color? headerColor;
+
+  /// set the progress indicator color
+  final Color? progressColor;
+
+  /// sets headers text style
+  final TextStyle? headerStyle;
+
+   /// sets progresses text style
+   final TextStyle? progressStyle;
+
+    /// sets headers height 
+  final double? headerHeight;
+
+    /// sets headers bottom controllers height 
+  final double? controllerHeight;
+
+  /// sets headers animation duration 
+  final Duration? headerAnimationDuration;
+
+  /// sets progress bar animation duration
+  final Duration? progressBarAnimationDuration;
+
+  /// sets bottom controller
   final Widget Function(Function() onNextTapped, Function() onBackTapped)?
       controlBuilder;
 
