@@ -13,3 +13,7 @@
 ## 0.1.0
 
 * Documents updated
+
+## 0.1.2
+
+* document text added
