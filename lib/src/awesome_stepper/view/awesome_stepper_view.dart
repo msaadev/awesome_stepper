@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class AwesomeStepper extends StatefulWidget {
-
   /// required to build steps
   final List<AwesomeStepperItem> steps;
 
@@ -20,16 +19,16 @@ class AwesomeStepper extends StatefulWidget {
   /// sets headers text style
   final TextStyle? headerStyle;
 
-   /// sets progresses text style
-   final TextStyle? progressStyle;
+  /// sets progresses text style
+  final TextStyle? progressStyle;
 
-    /// sets headers height 
+  /// sets headers height
   final double? headerHeight;
 
-    /// sets headers bottom controllers height 
+  /// sets headers bottom controllers height
   final double? controllerHeight;
 
-  /// sets headers animation duration 
+  /// sets headers animation duration
   final Duration? headerAnimationDuration;
 
   /// sets progress bar animation duration
