@@ -17,3 +17,7 @@
 ## 0.1.2
 
 * document text added
+
+## 0.1.3
+
+* project formatted
