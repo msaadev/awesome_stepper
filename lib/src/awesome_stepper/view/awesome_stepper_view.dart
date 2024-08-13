@@ -35,8 +35,7 @@ class AwesomeStepper extends StatefulWidget {
   final Duration? progressBarAnimationDuration;
 
   /// sets bottom controller
-  final Widget Function(Function() onNextTapped, Function() onBackTapped)?
-      controlBuilder;
+  final Widget Function(Function() onNextTapped, Function() onBackTapped)? controlBuilder;
 
   const AwesomeStepper(
       {Key? key,
@@ -56,8 +55,7 @@ class AwesomeStepper extends StatefulWidget {
   State<AwesomeStepper> createState() => _AwesomeStepperState();
 }
 
-class _AwesomeStepperState extends State<AwesomeStepper>
-    with TickerProviderStateMixin {
+class _AwesomeStepperState extends State<AwesomeStepper> with TickerProviderStateMixin {
   late final AwesomeStepperViewModel _viewModel;
   late final Animation<double> textAnimation;
   late final AnimationController _controller, _circleValue;
@@ -69,8 +67,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
     _viewModel = AwesomeStepperViewModel();
     _controller = AnimationController(
-      duration:
-          widget.headerAnimationDuration ?? const Duration(milliseconds: 250),
+      duration: widget.headerAnimationDuration ?? const Duration(milliseconds: 250),
       vsync: this,
     );
     _circleValue = AnimationController(
@@ -90,8 +87,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
     ratio = 1 / widget.steps.length;
 
-    Future.delayed(Duration(milliseconds: 500))
-        .whenComplete(() => _circleValue.animateTo(ratio));
+    Future.delayed(Duration(milliseconds: 500)).whenComplete(() => _circleValue.animateTo(ratio));
   }
 
   @override
@@ -190,10 +186,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
               alignment: Alignment.center,
               child: Text(
                 'Back',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.white),
               ),
             ),
           ),
@@ -214,10 +207,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
               alignment: Alignment.center,
               child: Text(
                 'Next',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.white),
               ),
             ),
           ),
@@ -227,14 +217,11 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   tap(bool isIncrement) {
-    isIncrement
-        ? _circleValue.animateTo(_circleValue.value + ratio)
-        : _circleValue.animateTo(_circleValue.value - ratio);
+    isIncrement ? _circleValue.animateTo(_circleValue.value + ratio) : _circleValue.animateTo(_circleValue.value - ratio);
     _controller.forward().whenComplete(() {
       isIncrement ? _viewModel.incrementStep() : _viewModel.decrementStep();
 
-      if (widget.onStepChanged != null)
-        widget.onStepChanged!(_viewModel.currentStep);
+      if (widget.onStepChanged != null) widget.onStepChanged!(_viewModel.currentStep);
 
       _controller.reverse();
     });
