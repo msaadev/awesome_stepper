@@ -92,6 +92,11 @@ class AwesomeStepper extends StatefulWidget {
   /// Width of the side list when there is no fold to align to.
   final double sideListWidth;
 
+  /// Maximum width of the page, the controls and the header content on wide
+  /// windows, so forms keep a readable line length. Phones are narrower, so
+  /// nothing changes there.
+  final double contentMaxWidth;
+
   /// Creates a stepper for [steps].
   const AwesomeStepper({
     super.key,
@@ -119,6 +124,7 @@ class AwesomeStepper extends StatefulWidget {
     this.hapticsEnabled = true,
     this.sideBySideMinWidth = 840,
     this.sideListWidth = 300,
+    this.contentMaxWidth = 720,
   });
 
   @override
@@ -209,8 +215,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     return Column(
       children: [
         _buildSemantics(_buildHeader(data)),
-        Expanded(child: _buildPage()),
-        _buildControls(),
+        Expanded(child: _constrain(_buildPage(), fillHeight: true)),
+        _constrain(_buildControls()),
       ],
     );
   }
@@ -234,8 +240,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         Expanded(
           child: Column(
             children: [
-              Expanded(child: _buildPage()),
-              _buildControls(),
+              Expanded(child: _constrain(_buildPage(), fillHeight: true)),
+              _constrain(_buildControls()),
             ],
           ),
         ),
@@ -248,9 +254,25 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     return StepperHeader(
       type: type,
       data: data,
+      maxContentWidth: widget.contentMaxWidth,
       height:
           widget.headerHeight ??
           (type == AwesomeStepperHeader.numbered ? 88 : 72),
+    );
+  }
+
+  // The page fills the column's height; the controls only need its width.
+  Widget _constrain(Widget child, {bool fillHeight = false}) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: widget.contentMaxWidth),
+        child: SizedBox(
+          width: double.infinity,
+          height: fillHeight ? double.infinity : null,
+          child: child,
+        ),
+      ),
     );
   }
 

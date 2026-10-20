@@ -161,6 +161,20 @@ void main() {
     expect(find.byType(Wrap), findsOneWidget);
   });
 
+  testWidgets('wide windows keep the page and buttons in a 720 px column', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(1200, 800),
+      headerType: AwesomeStepperHeader.dots,
+    );
+    final next = tester.getRect(find.text('Next'));
+    final back = tester.getRect(find.text('Back'));
+    expect(next.right - back.left, lessThanOrEqualTo(720));
+    expect(tester.getCenter(find.text('Page 1')).dx, 600);
+  });
+
   testWidgets('numbered header fits a narrow pane without overflow', (
     tester,
   ) async {

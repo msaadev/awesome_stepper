@@ -133,7 +133,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         children: [
           TextFormField(
             decoration: const InputDecoration(labelText: 'Full name'),
@@ -151,7 +151,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildExtras() {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       children: [
         SwitchListTile(
           title: const Text('Gift wrap'),
@@ -171,7 +171,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget _buildCentered(String text) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         child: Text(text, textAlign: TextAlign.center),
       ),
     );

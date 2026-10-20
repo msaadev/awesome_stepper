@@ -35,12 +35,14 @@ class StepperHeader extends StatelessWidget {
   final AwesomeStepperHeader type;
   final StepperHeaderData data;
   final double height;
+  final double maxContentWidth;
 
   const StepperHeader({
     super.key,
     required this.type,
     required this.data,
     required this.height,
+    this.maxContentWidth = double.infinity,
   });
 
   @override
@@ -50,12 +52,16 @@ class StepperHeader extends StatelessWidget {
       width: double.infinity,
       color: data.background,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: switch (type) {
-        AwesomeStepperHeader.circle => _buildCircle(),
-        AwesomeStepperHeader.bar => _buildBar(context),
-        AwesomeStepperHeader.dots => _buildDots(context),
-        AwesomeStepperHeader.numbered => _buildNumbered(context),
-      },
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxContentWidth),
+        child: switch (type) {
+          AwesomeStepperHeader.circle => _buildCircle(),
+          AwesomeStepperHeader.bar => _buildBar(context),
+          AwesomeStepperHeader.dots => _buildDots(context),
+          AwesomeStepperHeader.numbered => _buildNumbered(context),
+        },
+      ),
     );
   }
 

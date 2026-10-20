@@ -114,6 +114,7 @@ AwesomeStepper(
 | `swipeEnabled` / `keyboardEnabled` / `hapticsEnabled` | `true` | |
 | `sideBySideMinWidth` | 840 | `null` = never side by side |
 | `sideListWidth` | 300 | when there is no fold |
+| `contentMaxWidth` | 720 | page, buttons and header column on wide windows |
 
 ## Upgrading from 0.x
 

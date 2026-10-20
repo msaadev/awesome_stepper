@@ -2,6 +2,7 @@
 
 * Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were replaced by the side list. They now look the same at every width; only `circle` and `numbered` turn into the side list.
 * Fixed: the `numbered` header measured the screen instead of its own width, so it could overflow inside a pane.
+* Tablet layout: the page, the buttons and the header content stay in a centered 720 px column (`contentMaxWidth`) instead of stretching edge to edge. Phones are unchanged.
 * New logo.
 
 ## 1.0.0
