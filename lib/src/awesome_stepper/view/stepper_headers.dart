@@ -39,12 +39,18 @@ class StepperHeader extends StatelessWidget {
   final double height;
   final double maxContentWidth;
 
+  /// Tablet width: dots become full-width, labelled, tappable segments.
+  final bool wide;
+
+  static const double wideDotsMinWidth = 600;
+
   const StepperHeader({
     super.key,
     required this.type,
     required this.data,
     required this.height,
     this.maxContentWidth = double.infinity,
+    this.wide = false,
   });
 
   @override
@@ -60,7 +66,8 @@ class StepperHeader extends StatelessWidget {
         child: switch (type) {
           AwesomeStepperHeader.circle => _buildCircle(),
           AwesomeStepperHeader.bar => _buildBar(context),
-          AwesomeStepperHeader.dots => _buildDots(context),
+          AwesomeStepperHeader.dots =>
+            wide ? _buildWideDots(context) : _buildDots(context),
           AwesomeStepperHeader.numbered => _buildNumbered(context),
         },
       ),
@@ -133,6 +140,62 @@ class StepperHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildWideDots(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        StepTitle(data: data),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            for (var i = 0; i < data.steps.length; i++)
+              Expanded(child: _buildWideDot(i, scheme, textTheme)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWideDot(int index, ColorScheme scheme, TextTheme textTheme) {
+    final status = data.statuses[index];
+    final current = index == data.current;
+    return InkWell(
+      borderRadius: BorderRadius.circular(6),
+      onTap: status == AwesomeStepStatus.locked
+          ? null
+          : () => data.onTap(index),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              height: current ? 6 : 4,
+              decoration: BoxDecoration(
+                color: statusColor(status, data.accent, scheme),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.steps[index].label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.labelSmall?.copyWith(
+                fontWeight: current ? FontWeight.w600 : null,
+                color: current ? null : scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

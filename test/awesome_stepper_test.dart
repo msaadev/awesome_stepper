@@ -158,6 +158,28 @@ void main() {
       headerType: AwesomeStepperHeader.dots,
     );
     expect(find.byType(ListTile), findsNothing);
+    expect(find.byType(Wrap), findsNothing);
+  });
+
+  testWidgets('dots on tablets show tappable step labels', (tester) async {
+    int? changed;
+    await pump(
+      tester,
+      size: const Size(768, 1024),
+      headerType: AwesomeStepperHeader.dots,
+      onStepChanged: (i) => changed = i,
+    );
+    expect(find.text('Two'), findsOneWidget);
+    await tester.tap(find.text('Two'));
+    await tester.pumpAndSettle();
+    expect(changed, 1);
+    expect(find.text('Page 2'), findsOneWidget);
+
+    await pump(
+      tester,
+      size: const Size(400, 800),
+      headerType: AwesomeStepperHeader.dots,
+    );
     expect(find.byType(Wrap), findsOneWidget);
   });
 

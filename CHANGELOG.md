@@ -9,6 +9,7 @@
 * **State restoration**: `restorationId` keeps the active step when the app is killed and reopened.
 * **Theme**: `AwesomeStepperTheme` (a `ThemeExtension`) sets colors, text styles and button height app-wide.
 * **`allowHeaderJump`**: turn off jumping forward from the header (going back still works).
+* **Dots on tablets**: from 600 px the dots header becomes full-width segments with step names you can tap.
 * **Enter** goes to the next step on web, desktop and hardware keyboards.
 * Fixed: self-sized pages (for example a `Column` form) were centered vertically; they now start at the top.
 * Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were replaced by the side list. They now look the same at every width; only `circle` and `numbered` turn into the side list.

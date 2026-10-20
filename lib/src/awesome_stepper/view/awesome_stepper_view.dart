@@ -238,7 +238,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
               if (!_usesSideList ||
                   minWidth == null ||
                   constraints.maxWidth < minWidth) {
-                return _buildStacked(data);
+                return _buildStacked(data, constraints.maxWidth);
               }
               return _buildSideBySide(context, data, constraints);
             },
@@ -260,10 +260,10 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     );
   }
 
-  Widget _buildStacked(StepperHeaderData data) {
+  Widget _buildStacked(StepperHeaderData data, double width) {
     return Column(
       children: [
-        _buildSemantics(_buildHeader(data)),
+        _buildSemantics(_buildHeader(data, width)),
         Expanded(child: _constrain(_buildPage(), fillHeight: true)),
         _constrain(_buildControls()),
       ],
@@ -404,15 +404,20 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     );
   }
 
-  Widget _buildHeader(StepperHeaderData data) {
+  Widget _buildHeader(StepperHeaderData data, double width) {
     final type = widget.headerType;
+    final wide = width >= StepperHeader.wideDotsMinWidth;
     return StepperHeader(
       type: type,
       data: data,
       maxContentWidth: widget.contentMaxWidth,
+      wide: wide,
       height:
           widget.headerHeight ??
-          (type == AwesomeStepperHeader.numbered ? 88 : 72),
+          (type == AwesomeStepperHeader.numbered ||
+                  (type == AwesomeStepperHeader.dots && wide)
+              ? 88
+              : 72),
     );
   }
 
