@@ -709,7 +709,20 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     final check = widget.steps[index].canContinue;
     if (check == null) return true;
     setState(() => _busy = true);
-    final ok = await check();
+    var ok = false;
+    try {
+      ok = await check();
+    } catch (error, stack) {
+      // A throwing check (e.g. a failed request) counts as "not valid" and must not lock the buttons.
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'awesome_stepper',
+          context: ErrorDescription('while running canContinue of step $index'),
+        ),
+      );
+    }
     if (!mounted) return false;
     setState(() {
       _busy = false;

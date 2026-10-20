@@ -276,4 +276,55 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
   });
+
+  testWidgets('a throwing canContinue does not lock the buttons', (
+    tester,
+  ) async {
+    var calls = 0;
+    await pump(
+      tester,
+      steps: [
+        AwesomeStepperItem(
+          label: 'One',
+          content: const Text('Page 1'),
+          canContinue: () async {
+            calls++;
+            if (calls == 1) throw Exception('network down');
+            return true;
+          },
+        ),
+        const AwesomeStepperItem(label: 'Two', content: Text('Page 2')),
+      ],
+    );
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isException);
+    expect(find.text('Page 1'), findsOneWidget);
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Page 2'), findsOneWidget);
+  });
+
+  testWidgets('indicator follows totalSteps and its label', (tester) async {
+    Future<void> show(int total) => tester.pumpWidget(
+      MaterialApp(
+        home: AwesomeStepIndicator(
+          currentStep: 0,
+          totalSteps: total,
+          semanticsLabel: (step, total) => 'Adım $step / $total',
+        ),
+      ),
+    );
+    await show(2);
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('^Adım 1 / 2')), findsOneWidget);
+    await show(4);
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('^Adım 1 / 4')), findsOneWidget);
+    final bar = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
+    expect(bar.value, closeTo(0.25, 0.001));
+  });
 }

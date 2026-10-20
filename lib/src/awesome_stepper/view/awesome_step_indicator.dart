@@ -44,6 +44,9 @@ class AwesomeStepIndicator extends StatefulWidget {
   /// Duration of the progress animation.
   final Duration duration;
 
+  /// Screen reader text. Defaults to "Step {step} of {total}".
+  final String Function(int step, int total)? semanticsLabel;
+
   /// Creates a step indicator.
   const AwesomeStepIndicator({
     super.key,
@@ -57,9 +60,14 @@ class AwesomeStepIndicator extends StatefulWidget {
     this.onStepTapped,
     this.height,
     this.duration = const Duration(milliseconds: 400),
+    this.semanticsLabel,
   }) : assert(
          labels != null || totalSteps != null,
          'Pass labels or totalSteps',
+       ),
+       assert(
+         (labels?.length ?? totalSteps ?? 0) > 0,
+         'There must be at least one step',
        );
 
   @override
@@ -84,7 +92,8 @@ class _AwesomeStepIndicatorState extends State<AwesomeStepIndicator>
   void didUpdateWidget(AwesomeStepIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentStep != widget.currentStep ||
-        oldWidget.labels?.length != widget.labels?.length) {
+        oldWidget.labels?.length != widget.labels?.length ||
+        oldWidget.totalSteps != widget.totalSteps) {
       _progress.animateTo(_target);
     }
   }
@@ -129,7 +138,9 @@ class _AwesomeStepIndicatorState extends State<AwesomeStepIndicator>
       lineStyle: widget.lineStyle,
     );
     return Semantics(
-      label: 'Step ${current + 1} of $_total',
+      label:
+          widget.semanticsLabel?.call(current + 1, _total) ??
+          'Step ${current + 1} of $_total',
       child: StepperHeader(
         type: widget.type,
         data: data,
