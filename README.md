@@ -32,7 +32,7 @@ and a side-by-side layout on tablets and foldables. Material 3, dark mode, no de
 
 ```yaml
 dependencies:
-  awesome_stepper: ^1.0.1
+  awesome_stepper: ^1.1.0
 ```
 
 ## Usage: a multi-step form in Flutter
