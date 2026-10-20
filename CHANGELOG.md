@@ -12,6 +12,7 @@
 * A `canContinue` that throws (e.g. a failed request) counts as "not valid" and is reported; the
   buttons no longer stay disabled.
 * `AwesomeStepIndicator`: follows `totalSteps` changes, `semanticsLabel` for your language.
+* Enter in a multi-line text field types a new line instead of moving to the next step.
 * **Dots on tablets**: from 600 px the dots header becomes full-width segments with step names you can tap.
 * **Enter** goes to the next step on web, desktop and hardware keyboards.
 * Fixed: self-sized pages (for example a `Column` form) were centered vertically; they now start at the top.
