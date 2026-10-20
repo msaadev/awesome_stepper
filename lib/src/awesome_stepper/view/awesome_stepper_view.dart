@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' show DisplayFeatureType;
 
 import 'package:awesome_stepper/src/awesome_stepper/model/awesome_stepper_item.dart';
+import 'package:awesome_stepper/src/awesome_stepper/model/awesome_stepper_theme.dart';
 import 'package:awesome_stepper/src/awesome_stepper/view/stepper_headers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -97,6 +98,30 @@ class AwesomeStepper extends StatefulWidget {
   /// nothing changes there.
   final double contentMaxWidth;
 
+  /// Header on top with one page at a time, or steps listed vertically.
+  final AwesomeStepperLayout layout;
+
+  /// Page transition between steps.
+  final AwesomeStepperTransition transition;
+
+  /// Style of the lines between steps (numbered header and vertical layout).
+  final AwesomeStepperLineStyle lineStyle;
+
+  /// Label of the Skip button shown on optional steps.
+  final String skipLabel;
+
+  /// Whether tapping a later step in the header may jump forward
+  /// (still running each step's `canContinue`). Going back is always allowed.
+  final bool allowHeaderJump;
+
+  /// Shown instead of the page after the last step is finished, for a
+  /// summary or thank-you screen. Back returns to the last step.
+  final WidgetBuilder? completedBuilder;
+
+  /// Restores the active step after the app is killed and reopened
+  /// (needs a `restorationScopeId` on your `MaterialApp`).
+  final String? restorationId;
+
   /// Creates a stepper for [steps].
   const AwesomeStepper({
     super.key,
@@ -125,6 +150,13 @@ class AwesomeStepper extends StatefulWidget {
     this.sideBySideMinWidth = 840,
     this.sideListWidth = 300,
     this.contentMaxWidth = 720,
+    this.layout = AwesomeStepperLayout.horizontal,
+    this.transition = AwesomeStepperTransition.slide,
+    this.lineStyle = AwesomeStepperLineStyle.solid,
+    this.skipLabel = 'Skip',
+    this.allowHeaderJump = true,
+    this.completedBuilder,
+    this.restorationId,
   });
 
   @override
@@ -132,7 +164,7 @@ class AwesomeStepper extends StatefulWidget {
 }
 
 class _AwesomeStepperState extends State<AwesomeStepper>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, RestorationMixin {
   late final AnimationController _progressController;
   late AwesomeStepperController _controller;
   AwesomeStepperController? _ownController;
@@ -140,6 +172,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   bool _busy = false;
   bool _forward = true;
   Timer? _introTimer;
+  bool _completed = false;
+  final RestorableInt _restoredStep = RestorableInt(0);
 
   int get _step => _controller.currentStep;
 
@@ -165,6 +199,16 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   @override
+  String? get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_restoredStep, 'step');
+    if (oldBucket == null && initialRestore && _restoredStep.value == 0) return;
+    _controller._set(_restoredStep.value.clamp(0, widget.steps.length - 1));
+  }
+
+  @override
   void didUpdateWidget(AwesomeStepper oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
@@ -177,6 +221,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   @override
   void dispose() {
     _introTimer?.cancel();
+    _restoredStep.dispose();
     _detach();
     _progressController.dispose();
     super.dispose();
@@ -185,17 +230,19 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   @override
   Widget build(BuildContext context) {
     final data = _headerData(context);
-    final body = LayoutBuilder(
-      builder: (context, constraints) {
-        final minWidth = widget.sideBySideMinWidth;
-        if (!_usesSideList ||
-            minWidth == null ||
-            constraints.maxWidth < minWidth) {
-          return _buildStacked(data);
-        }
-        return _buildSideBySide(context, data, constraints);
-      },
-    );
+    final body = widget.layout == AwesomeStepperLayout.vertical
+        ? _buildVertical(data)
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              final minWidth = widget.sideBySideMinWidth;
+              if (!_usesSideList ||
+                  minWidth == null ||
+                  constraints.maxWidth < minWidth) {
+                return _buildStacked(data);
+              }
+              return _buildSideBySide(context, data, constraints);
+            },
+          );
     if (!widget.keyboardEnabled) return body;
     final rtl = Directionality.of(context) == TextDirection.rtl;
     return CallbackShortcuts(
@@ -206,6 +253,8 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         const SingleActivator(LogicalKeyboardKey.arrowLeft): rtl
             ? _next
             : _back,
+        const SingleActivator(LogicalKeyboardKey.enter): _next,
+        const SingleActivator(LogicalKeyboardKey.numpadEnter): _next,
       },
       child: Focus(child: body),
     );
@@ -244,6 +293,112 @@ class _AwesomeStepperState extends State<AwesomeStepper>
               _constrain(_buildControls()),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVertical(StepperHeaderData data) {
+    final completed = _completed && widget.completedBuilder != null;
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: widget.contentMaxWidth),
+        child: _buildSemantics(
+          ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            children: [
+              for (var i = 0; i < widget.steps.length; i++)
+                _buildVerticalStep(data, i),
+              if (completed)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: widget.completedBuilder!(context),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVerticalStep(StepperHeaderData data, int index) {
+    final step = widget.steps[index];
+    final status = data.statuses[index];
+    final active = index == _step && !_completed;
+    final isLast = index == widget.steps.length - 1;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: status == AwesomeStepStatus.locked
+              ? null
+              : () => _onHeaderTap(index),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                StatusBadge(
+                  index: index,
+                  status: status,
+                  accent: data.accent,
+                  icon: step.icon,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        step.label,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: active ? FontWeight.w600 : null,
+                        ),
+                      ),
+                      if (step.subtitle != null)
+                        Text(step.subtitle!, style: textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Stack(
+          children: [
+            if (!isLast)
+              Positioned(
+                left: 15,
+                top: 0,
+                bottom: 0,
+                child: CustomPaint(
+                  painter: StepLinePainter(
+                    color: status == AwesomeStepStatus.completed
+                        ? data.accent
+                        : scheme.outlineVariant,
+                    style: widget.lineStyle,
+                  ),
+                  child: const SizedBox(width: 2),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(left: 44),
+              child: AnimatedSize(
+                duration: widget.contentAnimationDuration,
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: active
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [step.content, _buildControls()],
+                      )
+                    : SizedBox(width: double.infinity, height: isLast ? 0 : 16),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -292,28 +447,53 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
   Widget _buildPage() {
     final rtl = Directionality.of(context) == TextDirection.rtl;
+    final completed = _completed && widget.completedBuilder != null;
     final page = AnimatedSwitcher(
-      duration: widget.contentAnimationDuration,
+      duration: widget.transition == AwesomeStepperTransition.none
+          ? Duration.zero
+          : widget.contentAnimationDuration,
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
+      // Top-aligned so self-sized pages (a Column form) start at the top, not mid-screen.
+      layoutBuilder: (current, previous) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...previous, ?current],
+      ),
       transitionBuilder: (child, animation) {
-        final incoming = child.key == ValueKey(_step);
-        var dx = (_forward == incoming) ? 0.12 : -0.12;
-        if (rtl) dx = -dx;
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween(
-              begin: Offset(dx, 0),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          ),
-        );
+        switch (widget.transition) {
+          case AwesomeStepperTransition.none:
+            return child;
+          case AwesomeStepperTransition.fade:
+            return FadeTransition(opacity: animation, child: child);
+          case AwesomeStepperTransition.scale:
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween(begin: 0.96, end: 1.0).animate(animation),
+                child: child,
+              ),
+            );
+          case AwesomeStepperTransition.slide:
+            final incoming = child.key == ValueKey(completed ? -1 : _step);
+            var dx = (_forward == incoming) ? 0.12 : -0.12;
+            if (rtl) dx = -dx;
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween(
+                  begin: Offset(dx, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+        }
       },
       child: KeyedSubtree(
-        key: ValueKey(_step),
-        child: widget.steps[_step].content,
+        key: ValueKey(completed ? -1 : _step),
+        child: completed
+            ? widget.completedBuilder!(context)
+            : widget.steps[_step].content,
       ),
     );
     if (!widget.swipeEnabled) return page;
@@ -330,9 +510,13 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Widget _buildControls() {
+    if (_completed && widget.completedBuilder != null) {
+      return const SizedBox.shrink();
+    }
     final builder = widget.controlBuilder;
     if (builder != null) return builder(_next, _back);
-    final size = Size(64, widget.controllerHeight ?? 48);
+    final theme = Theme.of(context).extension<AwesomeStepperTheme>();
+    final size = Size(64, widget.controllerHeight ?? theme?.buttonHeight ?? 48);
     final isFirst = _neighbour(-1) == null;
     final isLast = _neighbour(1) == null;
     return Padding(
@@ -345,10 +529,19 @@ class _AwesomeStepperState extends State<AwesomeStepper>
             child: Text(widget.backLabel),
           ),
           const Spacer(),
+          if (widget.steps[_step].optional)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: TextButton(
+                style: TextButton.styleFrom(minimumSize: size),
+                onPressed: _busy ? null : _skip,
+                child: Text(widget.skipLabel),
+              ),
+            ),
           FilledButton(
             style: FilledButton.styleFrom(
               minimumSize: size,
-              backgroundColor: widget.progressColor,
+              backgroundColor: widget.progressColor ?? theme?.accentColor,
             ),
             onPressed: _busy ? null : _next,
             child: _busy
@@ -365,24 +558,30 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
   StepperHeaderData _headerData(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context).extension<AwesomeStepperTheme>();
     return StepperHeaderData(
       steps: widget.steps,
       statuses: [for (var i = 0; i < widget.steps.length; i++) _statusOf(i)],
       current: _step,
       progress: _progressController,
-      background: widget.headerColor ?? scheme.surfaceContainerLow,
-      accent: widget.progressColor ?? scheme.primary,
-      titleStyle: widget.headerStyle,
-      progressStyle: widget.progressStyle,
+      background:
+          widget.headerColor ??
+          theme?.headerColor ??
+          scheme.surfaceContainerLow,
+      accent: widget.progressColor ?? theme?.accentColor ?? scheme.primary,
+      titleStyle: widget.headerStyle ?? theme?.titleStyle,
+      progressStyle: widget.progressStyle ?? theme?.progressStyle,
+      lineStyle: widget.lineStyle,
       titleDuration:
           widget.headerAnimationDuration ?? const Duration(milliseconds: 250),
-      onTap: _jumpTo,
+      onTap: _onHeaderTap,
     );
   }
 
   AwesomeStepStatus _statusOf(int index) {
     if (!widget.steps[index].enabled) return AwesomeStepStatus.locked;
     if (_errors.contains(index)) return AwesomeStepStatus.error;
+    if (_completed) return AwesomeStepStatus.completed;
     if (index == _step) return AwesomeStepStatus.active;
     if (index < _step) return AwesomeStepStatus.completed;
     return AwesomeStepStatus.upcoming;
@@ -439,14 +638,47 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Future<bool> _next() async {
+    if (_completed) return false;
     final target = _neighbour(1);
     if (target != null) return _jumpTo(target);
     if (_busy || !await _validate(_step)) return false;
-    widget.onCompleted?.call();
+    _complete();
     return true;
   }
 
+  Future<bool> _skip() async {
+    if (_busy || _completed) return false;
+    setState(() => _errors.remove(_step));
+    final target = _neighbour(1);
+    if (target == null) {
+      _complete();
+    } else {
+      _show(target);
+    }
+    return true;
+  }
+
+  void _complete() {
+    widget.onCompleted?.call();
+    if (widget.completedBuilder == null) return;
+    _forward = true;
+    _progressController.animateTo(1);
+    setState(() => _completed = true);
+  }
+
+  void _onHeaderTap(int index) {
+    if (!widget.allowHeaderJump && index > _step) return;
+    if (_completed) setState(() => _completed = false);
+    _jumpTo(index);
+  }
+
   Future<bool> _back() async {
+    if (_completed) {
+      _forward = false;
+      _progressController.animateTo((_step + 1) * _ratio);
+      setState(() => _completed = false);
+      return true;
+    }
     final target = _neighbour(-1);
     return target == null ? false : _jumpTo(target);
   }
@@ -486,6 +718,7 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     _forward = target > _step;
     _progressController.animateTo((target + 1) * _ratio);
     _controller._set(target);
+    _restoredStep.value = target;
     if (widget.hapticsEnabled) HapticFeedback.selectionClick();
     widget.onStepChanged?.call(target);
   }

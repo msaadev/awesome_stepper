@@ -18,6 +18,7 @@ class _ExampleAppState extends State<ExampleApp> {
     const seed = Color(0xFF6750A4);
     return MaterialApp(
       title: 'Awesome Stepper',
+      restorationScopeId: 'app',
       debugShowCheckedModeBanner: false,
       themeMode: _mode,
       theme: ThemeData(colorSchemeSeed: seed),
@@ -47,6 +48,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final _formKey = GlobalKey<FormState>();
   AwesomeStepperHeader _header = AwesomeStepperHeader.circle;
   bool _giftWrap = false;
+  AwesomeStepperLayout _layout = AwesomeStepperLayout.horizontal;
+  AwesomeStepperTransition _transition = AwesomeStepperTransition.slide;
+  AwesomeStepperLineStyle _line = AwesomeStepperLineStyle.solid;
 
   @override
   void dispose() {
@@ -60,6 +64,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       appBar: AppBar(
         title: const Text('Awesome Stepper'),
         actions: [
+          _buildOptionsMenu(),
           IconButton(
             tooltip: 'Toggle theme',
             icon: const Icon(Icons.dark_mode_outlined),
@@ -74,7 +79,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       body: AwesomeStepper(
         controller: _controller,
         headerType: _header,
+        layout: _layout,
+        transition: _transition,
+        lineStyle: _line,
+        restorationId: 'checkout',
         onCompleted: _showDone,
+        completedBuilder: (_) => _buildCentered('🎉 Order placed. Thank you!'),
         steps: [
           AwesomeStepperItem(
             label: 'Address',
@@ -86,6 +96,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           AwesomeStepperItem(
             label: 'Extras',
             subtitle: 'Optional',
+            optional: true,
             icon: Icons.redeem_outlined,
             content: _buildExtras(),
           ),
@@ -132,38 +143,74 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: ListView(
+      child: Padding(
         padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Full name'),
+              validator: _required,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Street'),
+              validator: _required,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExtras() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Full name'),
-            validator: _required,
+          SwitchListTile(
+            title: const Text('Gift wrap'),
+            subtitle: const Text('Unlocks the gift note step'),
+            value: _giftWrap,
+            onChanged: (value) => setState(() => _giftWrap = value),
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Street'),
-            validator: _required,
+          OutlinedButton(
+            onPressed: () => _controller.jumpTo(4),
+            child: const Text('Skip to review (controller.jumpTo)'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildExtras() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        SwitchListTile(
-          title: const Text('Gift wrap'),
-          subtitle: const Text('Unlocks the gift note step'),
-          value: _giftWrap,
-          onChanged: (value) => setState(() => _giftWrap = value),
-        ),
-        const SizedBox(height: 16),
-        OutlinedButton(
-          onPressed: () => _controller.jumpTo(4),
-          child: const Text('Skip to review (controller.jumpTo)'),
-        ),
+  Widget _buildOptionsMenu() {
+    return PopupMenuButton<VoidCallback>(
+      tooltip: 'Options',
+      icon: const Icon(Icons.tune),
+      onSelected: (apply) => setState(apply),
+      itemBuilder: (_) => [
+        for (final layout in AwesomeStepperLayout.values)
+          CheckedPopupMenuItem(
+            checked: _layout == layout,
+            value: () => _layout = layout,
+            child: Text('Layout: ${layout.name}'),
+          ),
+        const PopupMenuDivider(),
+        for (final transition in AwesomeStepperTransition.values)
+          CheckedPopupMenuItem(
+            checked: _transition == transition,
+            value: () => _transition = transition,
+            child: Text('Transition: ${transition.name}'),
+          ),
+        const PopupMenuDivider(),
+        for (final line in AwesomeStepperLineStyle.values)
+          CheckedPopupMenuItem(
+            checked: _line == line,
+            value: () => _line = line,
+            child: Text('Line: ${line.name}'),
+          ),
       ],
     );
   }
@@ -181,8 +228,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       (value ?? '').trim().isEmpty ? 'Required' : null;
 
   void _showDone() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Order placed')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Order placed')));
   }
 }

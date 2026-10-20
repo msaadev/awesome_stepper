@@ -23,6 +23,9 @@ class AwesomeStepperItem {
   /// Disabled steps are skipped by next / back and shown as locked.
   final bool enabled;
 
+  /// Optional steps show a Skip button that moves on without `canContinue`.
+  final bool optional;
+
   /// Creates a step.
   const AwesomeStepperItem({
     required this.label,
@@ -31,6 +34,7 @@ class AwesomeStepperItem {
     this.icon,
     this.canContinue,
     this.enabled = true,
+    this.optional = false,
   });
 }
 
@@ -65,4 +69,42 @@ enum AwesomeStepStatus {
 
   /// Disabled.
   locked,
+}
+
+/// How the steps are laid out.
+enum AwesomeStepperLayout {
+  /// A header on top and one page at a time (the default).
+  horizontal,
+
+  /// Steps listed top to bottom; the active step opens in place, like a
+  /// checkout or settings wizard. Step content must size itself (no
+  /// `Expanded` or unbounded lists at its root).
+  vertical,
+}
+
+/// Page transition between steps.
+enum AwesomeStepperTransition {
+  /// Slide in the direction of travel, with a fade (the default).
+  slide,
+
+  /// Cross-fade.
+  fade,
+
+  /// Fade with a slight zoom.
+  scale,
+
+  /// No animation.
+  none,
+}
+
+/// Style of the lines that connect steps.
+enum AwesomeStepperLineStyle {
+  /// A continuous line.
+  solid,
+
+  /// Round dots.
+  dotted,
+
+  /// Short dashes.
+  dashed,
 }

@@ -13,6 +13,7 @@ class StepperHeaderData {
   final TextStyle? progressStyle;
   final Duration titleDuration;
   final ValueChanged<int> onTap;
+  final AwesomeStepperLineStyle lineStyle;
 
   const StepperHeaderData({
     required this.steps,
@@ -25,6 +26,7 @@ class StepperHeaderData {
     required this.progressStyle,
     required this.titleDuration,
     required this.onTap,
+    this.lineStyle = AwesomeStepperLineStyle.solid,
   });
 
   String get counter => '${current + 1} / ${steps.length}';
@@ -147,13 +149,18 @@ class StepperHeader extends StatelessWidget {
             children: [
               for (var i = 0; i < data.steps.length; i++) ...[
                 if (i > 0)
-                  Container(
-                    width: 24,
-                    height: 2,
-                    margin: const EdgeInsets.only(top: 15),
-                    color: data.statuses[i - 1] == AwesomeStepStatus.completed
-                        ? data.accent
-                        : scheme.outlineVariant,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: CustomPaint(
+                      size: const Size(24, 2),
+                      painter: StepLinePainter(
+                        color:
+                            data.statuses[i - 1] == AwesomeStepStatus.completed
+                            ? data.accent
+                            : scheme.outlineVariant,
+                        style: data.lineStyle,
+                      ),
+                    ),
                   ),
                 _buildNumberedStep(context, i),
               ],
@@ -415,4 +422,40 @@ Color statusColor(AwesomeStepStatus status, Color accent, ColorScheme scheme) {
     AwesomeStepStatus.locked => scheme.outlineVariant.withValues(alpha: 0.5),
     AwesomeStepStatus.upcoming => scheme.outlineVariant,
   };
+}
+
+/// Draws a solid, dotted or dashed line along the longer side of its size.
+class StepLinePainter extends CustomPainter {
+  final Color color;
+  final AwesomeStepperLineStyle style;
+
+  const StepLinePainter({required this.color, required this.style});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final horizontal = size.width >= size.height;
+    final thickness = horizontal ? size.height : size.width;
+    final length = horizontal ? size.width : size.height;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = thickness
+      ..strokeCap = style == AwesomeStepperLineStyle.dotted
+          ? StrokeCap.round
+          : StrokeCap.butt;
+    Offset at(double d) =>
+        horizontal ? Offset(d, size.height / 2) : Offset(size.width / 2, d);
+    if (style == AwesomeStepperLineStyle.solid) {
+      canvas.drawLine(at(0), at(length), paint);
+      return;
+    }
+    final dash = style == AwesomeStepperLineStyle.dashed ? 6.0 : 0.1;
+    final gap = style == AwesomeStepperLineStyle.dashed ? 4.0 : thickness * 2.5;
+    for (var d = 0.0; d < length; d += dash + gap) {
+      canvas.drawLine(at(d), at((d + dash).clamp(0, length)), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(StepLinePainter old) =>
+      old.color != color || old.style != style;
 }

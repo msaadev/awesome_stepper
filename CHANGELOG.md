@@ -1,5 +1,16 @@
 ## 1.1.0
 
+* **Vertical stepper**: `layout: AwesomeStepperLayout.vertical` lists every step and opens the active one in place.
+* **`AwesomeStepIndicator`**: the step progress indicator on its own (circle, bar, dots, numbered), without pages or buttons. Easy move from `step_progress_indicator`.
+* **Optional steps**: `AwesomeStepperItem(optional: true)` shows a Skip button (`skipLabel`).
+* **Line styles**: `lineStyle: solid / dotted / dashed` for numbered and vertical steps.
+* **Transitions**: `transition: slide / fade / scale / none`.
+* **Completed screen**: `completedBuilder` shows a summary after the last step; `controller.back()` returns.
+* **State restoration**: `restorationId` keeps the active step when the app is killed and reopened.
+* **Theme**: `AwesomeStepperTheme` (a `ThemeExtension`) sets colors, text styles and button height app-wide.
+* **`allowHeaderJump`**: turn off jumping forward from the header (going back still works).
+* **Enter** goes to the next step on web, desktop and hardware keyboards.
+* Fixed: self-sized pages (for example a `Column` form) were centered vertically; they now start at the top.
 * Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were replaced by the side list. They now look the same at every width; only `circle` and `numbered` turn into the side list.
 * Fixed: the `numbered` header measured the screen instead of its own width, so it could overflow inside a pane.
 * Tablet layout: the page, the buttons and the header content stay in a centered 720 px column (`contentMaxWidth`) instead of stretching edge to edge. Phones are unchanged.

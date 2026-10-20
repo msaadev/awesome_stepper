@@ -17,7 +17,8 @@ and a side-by-side layout on tablets and foldables. Material 3, dark mode, no de
 
 ## Features of this Flutter stepper widget
 
-- **4 header styles**: the classic progress circle, a progress bar, dots, numbered steps.
+- **4 header styles**: the classic progress circle, a progress bar, dots, numbered steps — plus a **vertical stepper** layout.
+- **Standalone step progress indicator**: `AwesomeStepIndicator` without pages.
 - **Material 3**: colors come from your theme; light and dark mode out of the box.
 - **Smooth motion**: pages slide and fade, the title cross-fades, the progress animates.
 - **Validation**: `canContinue` per step (sync or async) keeps the user on an invalid step and marks it red.
@@ -89,6 +90,51 @@ AwesomeStepper(
 )
 ```
 
+### Vertical stepper
+
+```dart
+AwesomeStepper(
+  layout: AwesomeStepperLayout.vertical,
+  lineStyle: AwesomeStepperLineStyle.dashed,
+  steps: steps, // content must size itself: Column, not ListView
+)
+```
+
+### Optional steps, completed screen, restoration
+
+```dart
+AwesomeStepper(
+  restorationId: 'checkout',          // survives app restarts
+  completedBuilder: (_) => const ThankYouPage(),
+  steps: [
+    AwesomeStepperItem(label: 'Extras', optional: true, content: extras), // Skip button
+    ...
+  ],
+)
+```
+
+### Just the indicator: AwesomeStepIndicator
+
+```dart
+AwesomeStepIndicator(
+  type: AwesomeStepperHeader.bar,      // circle · bar · dots · numbered
+  currentStep: 1,                      // 0-based
+  labels: const ['Cart', 'Address', 'Payment'],
+)
+```
+
+**Coming from `step_progress_indicator`?** `StepProgressIndicator(totalSteps: 5, currentStep: 2)`
+becomes `AwesomeStepIndicator(totalSteps: 5, currentStep: 1)` — `currentStep` is the 0-based index
+of the active step. You get labels, numbered steps, animations, dark mode and accessibility for free.
+
+### Theme for the whole app
+
+```dart
+ThemeData(extensions: const [
+  AwesomeStepperTheme(accentColor: Colors.teal, buttonHeight: 52),
+])
+```
+
 ### Translations
 
 ```dart
@@ -115,6 +161,13 @@ AwesomeStepper(
 | `sideBySideMinWidth` | 840 | `null` = never side by side |
 | `sideListWidth` | 300 | when there is no fold |
 | `contentMaxWidth` | 720 | page, buttons and header column on wide windows |
+| `layout` | `horizontal` | `horizontal`, `vertical` |
+| `transition` | `slide` | `slide`, `fade`, `scale`, `none` |
+| `lineStyle` | `solid` | `solid`, `dotted`, `dashed` |
+| `skipLabel` | Skip | shown on `optional` steps |
+| `allowHeaderJump` | `true` | jump forward from the header |
+| `completedBuilder` | — | screen after the last step |
+| `restorationId` | — | keep the step across app restarts |
 
 ## Upgrading from 0.x
 
@@ -124,7 +177,7 @@ white / red / green); pass `headerColor` and `progressColor` to keep your colors
 
 ## Keywords
 
-Flutter stepper · step progress indicator · horizontal stepper · wizard · multi-step form ·
+Flutter stepper · step progress indicator · vertical stepper · horizontal stepper · wizard · multi-step form ·
 onboarding flow · checkout flow · form validation · progress bar · Material 3 stepper.
 
 Issues and ideas: [GitHub](https://github.com/msaadev/awesome_stepper/issues).
