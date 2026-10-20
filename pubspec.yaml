@@ -1,6 +1,6 @@
 name: awesome_stepper
 description: Beautiful, customizable Flutter stepper with animated progress headers, step validation, a controller and foldable-ready large-screen layout.
-version: 1.0.0
+version: 1.0.1
 homepage: https://monsware.com/awesome-stepper/
 repository: https://github.com/msaadev/awesome_stepper
 issue_tracker: https://github.com/msaadev/awesome_stepper/issues

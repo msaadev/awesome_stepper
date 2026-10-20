@@ -135,6 +135,11 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   Timer? _introTimer;
 
   int get _step => _controller.currentStep;
+
+  // The side list already is a circle + numbered list; bar and dots add their own look on top of the page.
+  bool get _showsHeaderBesideList =>
+      widget.headerType == AwesomeStepperHeader.bar ||
+      widget.headerType == AwesomeStepperHeader.dots;
   double get _ratio => 1 / widget.steps.length;
 
   @override
@@ -198,18 +203,9 @@ class _AwesomeStepperState extends State<AwesomeStepper>
   }
 
   Widget _buildStacked(StepperHeaderData data) {
-    final type = widget.headerType;
     return Column(
       children: [
-        _buildSemantics(
-          StepperHeader(
-            type: type,
-            data: data,
-            height:
-                widget.headerHeight ??
-                (type == AwesomeStepperHeader.numbered ? 88 : 72),
-          ),
-        ),
+        _buildSemantics(_buildHeader(data)),
         Expanded(child: _buildPage()),
         _buildControls(),
       ],
@@ -235,12 +231,24 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         Expanded(
           child: Column(
             children: [
+              if (_showsHeaderBesideList) _buildHeader(data),
               Expanded(child: _buildPage()),
               _buildControls(),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildHeader(StepperHeaderData data) {
+    final type = widget.headerType;
+    return StepperHeader(
+      type: type,
+      data: data,
+      height:
+          widget.headerHeight ??
+          (type == AwesomeStepperHeader.numbered ? 88 : 72),
     );
   }
 

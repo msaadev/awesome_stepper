@@ -1,3 +1,9 @@
+## 1.0.1
+
+* Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were not shown; they now sit above the page next to the side list.
+* Fixed: the `numbered` header measured the screen instead of its own width, so it could overflow inside a pane.
+* New logo.
+
 ## 1.0.0
 
 * New design: Material 3 colors from the theme, dark mode, sliding pages, cross-fading title, rounded progress.

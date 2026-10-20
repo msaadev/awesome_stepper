@@ -143,6 +143,54 @@ void main() {
     expect(find.byType(ListTile), findsNWidgets(2));
   });
 
+  testWidgets('wide window keeps the bar and dots headers', (tester) async {
+    await pump(
+      tester,
+      size: const Size(1100, 760),
+      headerType: AwesomeStepperHeader.bar,
+    );
+    expect(find.byType(ListTile), findsNWidgets(2));
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+    await pump(
+      tester,
+      size: const Size(1100, 760),
+      headerType: AwesomeStepperHeader.dots,
+    );
+    expect(find.byType(Wrap), findsOneWidget);
+  });
+
+  testWidgets('numbered header fits a narrow pane without overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Row(
+            children: [
+              const SizedBox(width: 640),
+              Expanded(
+                child: AwesomeStepper(
+                  headerType: AwesomeStepperHeader.numbered,
+                  steps: [
+                    for (var i = 0; i < 3; i++)
+                      AwesomeStepperItem(label: 'S$i', content: Text('P$i')),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('side list splits at a vertical fold', (tester) async {
     tester.view.physicalSize = const Size(951, 669);
     tester.view.devicePixelRatio = 1;

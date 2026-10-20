@@ -130,29 +130,29 @@ class StepperHeader extends StatelessWidget {
 
   Widget _buildNumbered(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.sizeOf(context).width - 32,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < data.steps.length; i++) ...[
-              if (i > 0)
-                Container(
-                  width: 24,
-                  height: 2,
-                  margin: const EdgeInsets.only(top: 15),
-                  color: data.statuses[i - 1] == AwesomeStepStatus.completed
-                      ? data.accent
-                      : scheme.outlineVariant,
-                ),
-              _buildNumberedStep(context, i),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < data.steps.length; i++) ...[
+                if (i > 0)
+                  Container(
+                    width: 24,
+                    height: 2,
+                    margin: const EdgeInsets.only(top: 15),
+                    color: data.statuses[i - 1] == AwesomeStepStatus.completed
+                        ? data.accent
+                        : scheme.outlineVariant,
+                  ),
+                _buildNumberedStep(context, i),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
