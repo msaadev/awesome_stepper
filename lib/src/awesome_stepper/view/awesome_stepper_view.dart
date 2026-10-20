@@ -84,7 +84,8 @@ class AwesomeStepper extends StatefulWidget {
   /// Light haptic feedback on step changes and failed checks.
   final bool hapticsEnabled;
 
-  /// From this width on, the steps are shown in a side list next to the page.
+  /// From this width on, the `circle` and `numbered` headers turn into a side
+  /// list next to the page (`bar` and `dots` stay as they are).
   /// `null` keeps the header layout at every width.
   final double? sideBySideMinWidth;
 
@@ -136,10 +137,10 @@ class _AwesomeStepperState extends State<AwesomeStepper>
 
   int get _step => _controller.currentStep;
 
-  // The side list already is a circle + numbered list; bar and dots add their own look on top of the page.
-  bool get _showsHeaderBesideList =>
-      widget.headerType == AwesomeStepperHeader.bar ||
-      widget.headerType == AwesomeStepperHeader.dots;
+  // Bar and dots keep their own look on every width; circle and numbered become the side list.
+  bool get _usesSideList =>
+      widget.headerType == AwesomeStepperHeader.circle ||
+      widget.headerType == AwesomeStepperHeader.numbered;
   double get _ratio => 1 / widget.steps.length;
 
   @override
@@ -181,7 +182,9 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     final body = LayoutBuilder(
       builder: (context, constraints) {
         final minWidth = widget.sideBySideMinWidth;
-        if (minWidth == null || constraints.maxWidth < minWidth) {
+        if (!_usesSideList ||
+            minWidth == null ||
+            constraints.maxWidth < minWidth) {
           return _buildStacked(data);
         }
         return _buildSideBySide(context, data, constraints);
@@ -231,7 +234,6 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         Expanded(
           child: Column(
             children: [
-              if (_showsHeaderBesideList) _buildHeader(data),
               Expanded(child: _buildPage()),
               _buildControls(),
             ],

@@ -23,7 +23,7 @@ and a side-by-side layout on tablets and foldables. Material 3, dark mode, no de
 - **Validation**: `canContinue` per step (sync or async) keeps the user on an invalid step and marks it red.
 - **Step states**: completed ✓, error !, locked 🔒 (disabled steps are skipped).
 - **Controller**: `next()`, `back()`, `jumpTo()`, listen to `currentStep`.
-- **Large screens & foldables**: from 840 px the steps move into a side list; on foldables
+- **Large screens & foldables**: from 840 px the `circle` and `numbered` headers become a side list; on foldables
   (Galaxy Z Fold, Pixel Fold, iPhone Duo) the split follows the fold.
 - **Accessible**: screen reader announces "Step 2 of 5: Payment", 48 px buttons, RTL, arrow keys, swipe, haptics.
 - **No dependencies** besides Flutter.

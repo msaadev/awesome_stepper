@@ -143,13 +143,13 @@ void main() {
     expect(find.byType(ListTile), findsNWidgets(2));
   });
 
-  testWidgets('wide window keeps the bar and dots headers', (tester) async {
+  testWidgets('bar and dots stay as they are on wide windows', (tester) async {
     await pump(
       tester,
       size: const Size(1100, 760),
       headerType: AwesomeStepperHeader.bar,
     );
-    expect(find.byType(ListTile), findsNWidgets(2));
+    expect(find.byType(ListTile), findsNothing);
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
 
     await pump(
@@ -157,6 +157,7 @@ void main() {
       size: const Size(1100, 760),
       headerType: AwesomeStepperHeader.dots,
     );
+    expect(find.byType(ListTile), findsNothing);
     expect(find.byType(Wrap), findsOneWidget);
   });
 

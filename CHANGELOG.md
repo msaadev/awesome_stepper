@@ -1,6 +1,6 @@
 ## 1.0.1
 
-* Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were not shown; they now sit above the page next to the side list.
+* Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were replaced by the side list. They now look the same at every width; only `circle` and `numbered` turn into the side list.
 * Fixed: the `numbered` header measured the screen instead of its own width, so it could overflow inside a pane.
 * New logo.
 
