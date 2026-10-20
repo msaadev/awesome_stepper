@@ -253,10 +253,17 @@ class _AwesomeStepperState extends State<AwesomeStepper>
         const SingleActivator(LogicalKeyboardKey.arrowLeft): rtl
             ? _next
             : _back,
-        const SingleActivator(LogicalKeyboardKey.enter): _next,
-        const SingleActivator(LogicalKeyboardKey.numpadEnter): _next,
       },
-      child: Focus(child: body),
+      child: Shortcuts(
+        shortcuts: const {
+          SingleActivator(LogicalKeyboardKey.enter): _EnterIntent(),
+          SingleActivator(LogicalKeyboardKey.numpadEnter): _EnterIntent(),
+        },
+        child: Actions(
+          actions: {_EnterIntent: _EnterAction(_next)},
+          child: Focus(child: body),
+        ),
+      ),
     );
   }
 
@@ -740,4 +747,25 @@ class _AwesomeStepperState extends State<AwesomeStepper>
     if (widget.hapticsEnabled) HapticFeedback.selectionClick();
     widget.onStepChanged?.call(target);
   }
+}
+
+class _EnterIntent extends Intent {
+  const _EnterIntent();
+}
+
+class _EnterAction extends Action<_EnterIntent> {
+  final VoidCallback onEnter;
+
+  _EnterAction(this.onEnter);
+
+  // A disabled action lets Enter reach the text field to insert a new line.
+  @override
+  bool isEnabled(_EnterIntent intent) {
+    final context = FocusManager.instance.primaryFocus?.context;
+    final editable = context?.findAncestorWidgetOfExactType<EditableText>();
+    return editable == null || editable.maxLines == 1;
+  }
+
+  @override
+  void invoke(_EnterIntent intent) => onEnter();
 }
