@@ -9,7 +9,7 @@
 an animated step progress indicator, sliding pages, form validation per step, a controller,
 and a side-by-side layout on tablets and foldables. Material 3, dark mode, no dependencies.
 
-🏆 Award-winning: awesome_stepper won a Flutter developer challenge in 2021. Version 1.0 is a full redesign.
+🏆 Award-winning: awesome_stepper won **1st place** in the Autumn Flutter Package Development Challenge (2021), organized by Levent Kantaroğlu. Version 1.0 is a full redesign.
 
 <p align="center"><img src="https://raw.githubusercontent.com/msaadev/awesome_stepper/master/screen_shots/awesome_stepper.gif" width="320" alt="Flutter stepper with progress indicator, numbered steps and form validation"></p>
 
