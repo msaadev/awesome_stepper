@@ -1,3 +1,28 @@
+## 1.1.0
+
+* Every public member is documented (`public_member_api_docs` is on), so hovering any field or
+  method in your IDE says what it does.
+* **Vertical stepper**: `layout: AwesomeStepperLayout.vertical` lists every step and opens the active one in place.
+* **`AwesomeStepIndicator`**: the step progress indicator on its own (circle, bar, dots, numbered), without pages or buttons. Easy move from `step_progress_indicator`.
+* **Optional steps**: `AwesomeStepperItem(optional: true)` shows a Skip button (`skipLabel`).
+* **Line styles**: `lineStyle: solid / dotted / dashed` for numbered and vertical steps.
+* **Transitions**: `transition: slide / fade / scale / none`.
+* **Completed screen**: `completedBuilder` shows a summary after the last step; `controller.back()` returns.
+* **State restoration**: `restorationId` keeps the active step when the app is killed and reopened.
+* **Theme**: `AwesomeStepperTheme` (a `ThemeExtension`) sets colors, text styles and button height app-wide.
+* **`allowHeaderJump`**: turn off jumping forward from the header (going back still works).
+* A `canContinue` that throws (e.g. a failed request) counts as "not valid" and is reported; the
+  buttons no longer stay disabled.
+* `AwesomeStepIndicator`: follows `totalSteps` changes, `semanticsLabel` for your language.
+* Enter in a multi-line text field types a new line instead of moving to the next step.
+* **Dots on tablets**: from 600 px the dots header becomes full-width segments with step names you can tap.
+* **Enter** goes to the next step on web, desktop and hardware keyboards.
+* Fixed: self-sized pages (for example a `Column` form) were centered vertically; they now start at the top.
+* Fixed: on wide windows (tablets, desktop, open foldables) the `bar` and `dots` headers were replaced by the side list. They now look the same at every width; only `circle` and `numbered` turn into the side list.
+* Fixed: the `numbered` header measured the screen instead of its own width, so it could overflow inside a pane.
+* Tablet layout: the page, the buttons and the header content stay in a centered 720 px column (`contentMaxWidth`) instead of stretching edge to edge. Phones are unchanged.
+* New logo.
+
 ## 1.0.0
 
 * New design: Material 3 colors from the theme, dark mode, sliding pages, cross-fading title, rounded progress.

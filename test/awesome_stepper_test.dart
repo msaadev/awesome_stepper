@@ -143,6 +143,91 @@ void main() {
     expect(find.byType(ListTile), findsNWidgets(2));
   });
 
+  testWidgets('bar and dots stay as they are on wide windows', (tester) async {
+    await pump(
+      tester,
+      size: const Size(1100, 760),
+      headerType: AwesomeStepperHeader.bar,
+    );
+    expect(find.byType(ListTile), findsNothing);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+    await pump(
+      tester,
+      size: const Size(1100, 760),
+      headerType: AwesomeStepperHeader.dots,
+    );
+    expect(find.byType(ListTile), findsNothing);
+    expect(find.byType(Wrap), findsNothing);
+  });
+
+  testWidgets('dots on tablets show tappable step labels', (tester) async {
+    int? changed;
+    await pump(
+      tester,
+      size: const Size(768, 1024),
+      headerType: AwesomeStepperHeader.dots,
+      onStepChanged: (i) => changed = i,
+    );
+    expect(find.text('Two'), findsOneWidget);
+    await tester.tap(find.text('Two'));
+    await tester.pumpAndSettle();
+    expect(changed, 1);
+    expect(find.text('Page 2'), findsOneWidget);
+
+    await pump(
+      tester,
+      size: const Size(400, 800),
+      headerType: AwesomeStepperHeader.dots,
+    );
+    expect(find.byType(Wrap), findsOneWidget);
+  });
+
+  testWidgets('wide windows keep the page and buttons in a 720 px column', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(1200, 800),
+      headerType: AwesomeStepperHeader.dots,
+    );
+    final next = tester.getRect(find.text('Next'));
+    final back = tester.getRect(find.text('Back'));
+    expect(next.right - back.left, lessThanOrEqualTo(720));
+    expect(tester.getCenter(find.text('Page 1')).dx, 600);
+  });
+
+  testWidgets('numbered header fits a narrow pane without overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Row(
+            children: [
+              const SizedBox(width: 640),
+              Expanded(
+                child: AwesomeStepper(
+                  headerType: AwesomeStepperHeader.numbered,
+                  steps: [
+                    for (var i = 0; i < 3; i++)
+                      AwesomeStepperItem(label: 'S$i', content: Text('P$i')),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('side list splits at a vertical fold', (tester) async {
     tester.view.physicalSize = const Size(951, 669);
     tester.view.devicePixelRatio = 1;
@@ -190,5 +275,56 @@ void main() {
     );
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('a throwing canContinue does not lock the buttons', (
+    tester,
+  ) async {
+    var calls = 0;
+    await pump(
+      tester,
+      steps: [
+        AwesomeStepperItem(
+          label: 'One',
+          content: const Text('Page 1'),
+          canContinue: () async {
+            calls++;
+            if (calls == 1) throw Exception('network down');
+            return true;
+          },
+        ),
+        const AwesomeStepperItem(label: 'Two', content: Text('Page 2')),
+      ],
+    );
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isException);
+    expect(find.text('Page 1'), findsOneWidget);
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Page 2'), findsOneWidget);
+  });
+
+  testWidgets('indicator follows totalSteps and its label', (tester) async {
+    Future<void> show(int total) => tester.pumpWidget(
+      MaterialApp(
+        home: AwesomeStepIndicator(
+          currentStep: 0,
+          totalSteps: total,
+          semanticsLabel: (step, total) => 'Adım $step / $total',
+        ),
+      ),
+    );
+    await show(2);
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('^Adım 1 / 2')), findsOneWidget);
+    await show(4);
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('^Adım 1 / 4')), findsOneWidget);
+    final bar = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
+    expect(bar.value, closeTo(0.25, 0.001));
   });
 }

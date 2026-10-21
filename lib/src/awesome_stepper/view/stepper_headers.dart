@@ -3,17 +3,40 @@ import 'package:flutter/material.dart';
 
 /// Everything a header needs; built once per frame by the stepper.
 class StepperHeaderData {
+  /// The steps, in order.
   final List<AwesomeStepperItem> steps;
+
+  /// Status of each step, same order as [steps].
   final List<AwesomeStepStatus> statuses;
+
+  /// Index of the active step.
   final int current;
+
+  /// Progress from 0 to 1, animated by the stepper.
   final Animation<double> progress;
+
+  /// Header background color.
   final Color background;
+
+  /// Color of the active and done steps.
   final Color accent;
+
+  /// Text style of the step title.
   final TextStyle? titleStyle;
+
+  /// Text style of the "current / total" counter.
   final TextStyle? progressStyle;
+
+  /// How long the title cross-fades when the step changes.
   final Duration titleDuration;
+
+  /// Called with a step index when the user taps a step.
   final ValueChanged<int> onTap;
 
+  /// Line style between steps.
+  final AwesomeStepperLineStyle lineStyle;
+
+  /// Creates the header data.
   const StepperHeaderData({
     required this.steps,
     required this.statuses,
@@ -25,22 +48,41 @@ class StepperHeaderData {
     required this.progressStyle,
     required this.titleDuration,
     required this.onTap,
+    this.lineStyle = AwesomeStepperLineStyle.solid,
   });
 
+  /// The "current / total" text, e.g. "2 / 5".
   String get counter => '${current + 1} / ${steps.length}';
 }
 
 /// The horizontal header above the content.
 class StepperHeader extends StatelessWidget {
+  /// Which header to draw.
   final AwesomeStepperHeader type;
+
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Height of the header.
   final double height;
 
+  /// The header content never gets wider than this and stays centered.
+  final double maxContentWidth;
+
+  /// Tablet width: dots become full-width, labelled, tappable segments.
+  final bool wide;
+
+  /// From this window width on, the stepper turns on [wide].
+  static const double wideDotsMinWidth = 600;
+
+  /// Creates the header.
   const StepperHeader({
     super.key,
     required this.type,
     required this.data,
     required this.height,
+    this.maxContentWidth = double.infinity,
+    this.wide = false,
   });
 
   @override
@@ -50,12 +92,17 @@ class StepperHeader extends StatelessWidget {
       width: double.infinity,
       color: data.background,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: switch (type) {
-        AwesomeStepperHeader.circle => _buildCircle(),
-        AwesomeStepperHeader.bar => _buildBar(context),
-        AwesomeStepperHeader.dots => _buildDots(context),
-        AwesomeStepperHeader.numbered => _buildNumbered(context),
-      },
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxContentWidth),
+        child: switch (type) {
+          AwesomeStepperHeader.circle => _buildCircle(),
+          AwesomeStepperHeader.bar => _buildBar(context),
+          AwesomeStepperHeader.dots =>
+            wide ? _buildWideDots(context) : _buildDots(context),
+          AwesomeStepperHeader.numbered => _buildNumbered(context),
+        },
+      ),
     );
   }
 
@@ -128,31 +175,92 @@ class StepperHeader extends StatelessWidget {
     );
   }
 
+  Widget _buildWideDots(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        StepTitle(data: data),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            for (var i = 0; i < data.steps.length; i++)
+              Expanded(child: _buildWideDot(i, scheme, textTheme)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWideDot(int index, ColorScheme scheme, TextTheme textTheme) {
+    final status = data.statuses[index];
+    final current = index == data.current;
+    return InkWell(
+      borderRadius: BorderRadius.circular(6),
+      onTap: status == AwesomeStepStatus.locked
+          ? null
+          : () => data.onTap(index),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              height: current ? 6 : 4,
+              decoration: BoxDecoration(
+                color: statusColor(status, data.accent, scheme),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.steps[index].label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.labelSmall?.copyWith(
+                fontWeight: current ? FontWeight.w600 : null,
+                color: current ? null : scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildNumbered(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.sizeOf(context).width - 32,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < data.steps.length; i++) ...[
-              if (i > 0)
-                Container(
-                  width: 24,
-                  height: 2,
-                  margin: const EdgeInsets.only(top: 15),
-                  color: data.statuses[i - 1] == AwesomeStepStatus.completed
-                      ? data.accent
-                      : scheme.outlineVariant,
-                ),
-              _buildNumberedStep(context, i),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < data.steps.length; i++) ...[
+                if (i > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: CustomPaint(
+                      size: const Size(24, 2),
+                      painter: StepLinePainter(
+                        color:
+                            data.statuses[i - 1] == AwesomeStepStatus.completed
+                            ? data.accent
+                            : scheme.outlineVariant,
+                        style: data.lineStyle,
+                      ),
+                    ),
+                  ),
+                _buildNumberedStep(context, i),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -196,8 +304,10 @@ class StepperHeader extends StatelessWidget {
 
 /// The vertical step list used on wide screens.
 class StepperSideList extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
 
+  /// Creates the side list.
   const StepperSideList({super.key, required this.data});
 
   @override
@@ -242,9 +352,13 @@ class StepperSideList extends StatelessWidget {
 
 /// The classic Awesome Stepper progress circle with "current / total".
 class ProgressCircle extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Width of the progress ring.
   final double strokeWidth;
 
+  /// Creates the progress circle.
   const ProgressCircle({super.key, required this.data, this.strokeWidth = 5});
 
   @override
@@ -283,9 +397,13 @@ class ProgressCircle extends StatelessWidget {
 
 /// The active step's title (and subtitle), cross-fading on change.
 class StepTitle extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Alignment of the title text.
   final TextAlign align;
 
+  /// Creates the title.
   const StepTitle({
     super.key,
     required this.data,
@@ -334,11 +452,19 @@ class StepTitle extends StatelessWidget {
 
 /// Number, check, error or lock badge of one step.
 class StatusBadge extends StatelessWidget {
+  /// Zero-based index of the step; shown as index + 1.
   final int index;
+
+  /// Which badge to show.
   final AwesomeStepStatus status;
+
+  /// Color of the active and done badge.
   final Color accent;
+
+  /// Custom icon instead of the step number.
   final IconData? icon;
 
+  /// Creates the badge.
   const StatusBadge({
     super.key,
     required this.index,
@@ -409,4 +535,44 @@ Color statusColor(AwesomeStepStatus status, Color accent, ColorScheme scheme) {
     AwesomeStepStatus.locked => scheme.outlineVariant.withValues(alpha: 0.5),
     AwesomeStepStatus.upcoming => scheme.outlineVariant,
   };
+}
+
+/// Draws a solid, dotted or dashed line along the longer side of its size.
+class StepLinePainter extends CustomPainter {
+  /// Line color.
+  final Color color;
+
+  /// Solid, dotted or dashed.
+  final AwesomeStepperLineStyle style;
+
+  /// Creates the painter.
+  const StepLinePainter({required this.color, required this.style});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final horizontal = size.width >= size.height;
+    final thickness = horizontal ? size.height : size.width;
+    final length = horizontal ? size.width : size.height;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = thickness
+      ..strokeCap = style == AwesomeStepperLineStyle.dotted
+          ? StrokeCap.round
+          : StrokeCap.butt;
+    Offset at(double d) =>
+        horizontal ? Offset(d, size.height / 2) : Offset(size.width / 2, d);
+    if (style == AwesomeStepperLineStyle.solid) {
+      canvas.drawLine(at(0), at(length), paint);
+      return;
+    }
+    final dash = style == AwesomeStepperLineStyle.dashed ? 6.0 : 0.1;
+    final gap = style == AwesomeStepperLineStyle.dashed ? 4.0 : thickness * 2.5;
+    for (var d = 0.0; d < length; d += dash + gap) {
+      canvas.drawLine(at(d), at((d + dash).clamp(0, length)), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(StepLinePainter old) =>
+      old.color != color || old.style != style;
 }

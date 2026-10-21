@@ -1,0 +1,6 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Only the package's public API needs docs, not the demo app.
+    public_member_api_docs: false
