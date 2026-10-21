@@ -1,5 +1,7 @@
 ## 1.1.0
 
+* Every public member is documented (`public_member_api_docs` is on), so hovering any field or
+  method in your IDE says what it does.
 * **Vertical stepper**: `layout: AwesomeStepperLayout.vertical` lists every step and opens the active one in place.
 * **`AwesomeStepIndicator`**: the step progress indicator on its own (circle, bar, dots, numbered), without pages or buttons. Easy move from `step_progress_indicator`.
 * **Optional steps**: `AwesomeStepperItem(optional: true)` shows a Skip button (`skipLabel`).

@@ -3,18 +3,40 @@ import 'package:flutter/material.dart';
 
 /// Everything a header needs; built once per frame by the stepper.
 class StepperHeaderData {
+  /// The steps, in order.
   final List<AwesomeStepperItem> steps;
+
+  /// Status of each step, same order as [steps].
   final List<AwesomeStepStatus> statuses;
+
+  /// Index of the active step.
   final int current;
+
+  /// Progress from 0 to 1, animated by the stepper.
   final Animation<double> progress;
+
+  /// Header background color.
   final Color background;
+
+  /// Color of the active and done steps.
   final Color accent;
+
+  /// Text style of the step title.
   final TextStyle? titleStyle;
+
+  /// Text style of the "current / total" counter.
   final TextStyle? progressStyle;
+
+  /// How long the title cross-fades when the step changes.
   final Duration titleDuration;
+
+  /// Called with a step index when the user taps a step.
   final ValueChanged<int> onTap;
+
+  /// Line style between steps.
   final AwesomeStepperLineStyle lineStyle;
 
+  /// Creates the header data.
   const StepperHeaderData({
     required this.steps,
     required this.statuses,
@@ -29,21 +51,31 @@ class StepperHeaderData {
     this.lineStyle = AwesomeStepperLineStyle.solid,
   });
 
+  /// The "current / total" text, e.g. "2 / 5".
   String get counter => '${current + 1} / ${steps.length}';
 }
 
 /// The horizontal header above the content.
 class StepperHeader extends StatelessWidget {
+  /// Which header to draw.
   final AwesomeStepperHeader type;
+
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Height of the header.
   final double height;
+
+  /// The header content never gets wider than this and stays centered.
   final double maxContentWidth;
 
   /// Tablet width: dots become full-width, labelled, tappable segments.
   final bool wide;
 
+  /// From this window width on, the stepper turns on [wide].
   static const double wideDotsMinWidth = 600;
 
+  /// Creates the header.
   const StepperHeader({
     super.key,
     required this.type,
@@ -272,8 +304,10 @@ class StepperHeader extends StatelessWidget {
 
 /// The vertical step list used on wide screens.
 class StepperSideList extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
 
+  /// Creates the side list.
   const StepperSideList({super.key, required this.data});
 
   @override
@@ -318,9 +352,13 @@ class StepperSideList extends StatelessWidget {
 
 /// The classic Awesome Stepper progress circle with "current / total".
 class ProgressCircle extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Width of the progress ring.
   final double strokeWidth;
 
+  /// Creates the progress circle.
   const ProgressCircle({super.key, required this.data, this.strokeWidth = 5});
 
   @override
@@ -359,9 +397,13 @@ class ProgressCircle extends StatelessWidget {
 
 /// The active step's title (and subtitle), cross-fading on change.
 class StepTitle extends StatelessWidget {
+  /// The steps and their state.
   final StepperHeaderData data;
+
+  /// Alignment of the title text.
   final TextAlign align;
 
+  /// Creates the title.
   const StepTitle({
     super.key,
     required this.data,
@@ -410,11 +452,19 @@ class StepTitle extends StatelessWidget {
 
 /// Number, check, error or lock badge of one step.
 class StatusBadge extends StatelessWidget {
+  /// Zero-based index of the step; shown as index + 1.
   final int index;
+
+  /// Which badge to show.
   final AwesomeStepStatus status;
+
+  /// Color of the active and done badge.
   final Color accent;
+
+  /// Custom icon instead of the step number.
   final IconData? icon;
 
+  /// Creates the badge.
   const StatusBadge({
     super.key,
     required this.index,
@@ -489,9 +539,13 @@ Color statusColor(AwesomeStepStatus status, Color accent, ColorScheme scheme) {
 
 /// Draws a solid, dotted or dashed line along the longer side of its size.
 class StepLinePainter extends CustomPainter {
+  /// Line color.
   final Color color;
+
+  /// Solid, dotted or dashed.
   final AwesomeStepperLineStyle style;
 
+  /// Creates the painter.
   const StepLinePainter({required this.color, required this.style});
 
   @override
